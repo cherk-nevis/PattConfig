@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PattConfig</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card: #121215;
+      --surface: #18181b;
+      --border: #27272a;
+      --border-active: #52525b;
+      --text: #fafafa;
+      --text-dim: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #16a34a;
+      --success-hover: #15803d;
+      --ring: rgba(37, 99, 235, 0.25);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+
+    .wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .helper {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    textarea, input[type="text"], input[type="number"], select {
+      width: 100%;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    textarea.mono, input.mono {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--border-active);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.45;
+    }
+
+    .grid-ports {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 540px) {
+      .grid-ports {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .port-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 4px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .port-item:hover {
+      border-color: var(--border-active);
+    }
+
+    .port-item input {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .btn-text:hover {
+      color: var(--text);
+    }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background-color: var(--surface);
+      margin-bottom: 18px;
+    }
+
+    summary {
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+    }
+
+    summary:hover {
+      color: var(--text);
+    }
+
+    .details-body {
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      background-color: var(--card);
+    }
+
+    .ports-inbound-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 500px) {
+      .ports-inbound-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 440px) {
+      .actions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    button.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.12s ease, transform 0.08s ease;
+    }
+
+    button.btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--surface);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #27272a;
+      border-color: var(--border-active);
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 10px 14px;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-top: 14px;
+    }
+
+    .status-count {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--border-active);
+      transition: color 0.12s ease, border-bottom-color 0.12s ease;
+    }
+
+    .footer a:hover {
+      color: var(--text);
+      border-bottom-color: var(--text);
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--surface);
+      border: 1px solid var(--border-active);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1>PattConfig</h1>
+      <button type="button" class="btn-text" onclick="resetForm()">Clear</button>
+    </header>
+
+    <div class="card">
+      <div class="field">
+        <div class="field-header">
+          <label for="vlessLinks">VLESS / Trojan Links</label>
+          <span class="helper">One URL per line</span>
+        </div>
+        <textarea id="vlessLinks" class="mono" rows="4" placeholder="vless://... or trojan://..." oninput="update()"></textarea>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="cleanIps">Clean IP / Domain</label>
+          <span class="helper">One endpoint per line</span>
+        </div>
+        <textarea id="cleanIps" class="mono" rows="2" placeholder="188.114.97.6" oninput="update()"></textarea>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label>Cloudflare Ports</label>
+          <div class="quick-actions">
+            <button type="button" class="btn-text" onclick="setPorts(true)">Select All</button>
+          </div>
+        </div>
+        <div class="grid-ports">
+          <label class="port-item"><input type="checkbox" name="port" value="443" checked onchange="update()"> 443</label>
+          <label class="port-item"><input type="checkbox" name="port" value="8443" onchange="update()"> 8443</label>
+          <label class="port-item"><input type="checkbox" name="port" value="2053" onchange="update()"> 2053</label>
+          <label class="port-item"><input type="checkbox" name="port" value="2083" onchange="update()"> 2083</label>
+          <label class="port-item"><input type="checkbox" name="port" value="2087" onchange="update()"> 2087</label>
+          <label class="port-item"><input type="checkbox" name="port" value="2096" onchange="update()"> 2096</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="inboundPreset">Inbound Proxy Port</label>
+        </div>
+        <div class="ports-inbound-row">
+          <select id="inboundPreset" onchange="handleInboundChange()">
+            <option value="10808" selected>10808 (SOCKS) / 10809 (HTTP)</option>
+            <option value="2080">2080 (SOCKS) / 2081 (HTTP)</option>
+            <option value="custom">Custom SOCKS Port...</option>
+          </select>
+          <input type="number" id="customPort" class="mono" style="display:none;" placeholder="SOCKS Port" min="1024" max="65534" oninput="update()">
+        </div>
+      </div>
+
+      <details id="advancedSection">
+        <summary>Advanced Options</summary>
+        <div class="details-body">
+          <div class="field">
+            <label for="tlsFingerprint">TLS Fingerprint</label>
+            <select id="tlsFingerprint" onchange="update()">
+              <option value="unsafe" selected>unsafe</option>
+              <option value="chrome">chrome</option>
+              <option value="firefox">firefox</option>
+              <option value="safari">safari</option>
+              <option value="ios">ios</option>
+              <option value="android">android</option>
+              <option value="edge">edge</option>
+              <option value="360">360</option>
+              <option value="qq">qq</option>
+              <option value="random">random</option>
+              <option value="randomized">randomized</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="tlsAlpn">ALPN</label>
+            <input type="text" id="tlsAlpn" class="mono" value="http/1.1" oninput="update()">
+          </div>
+
+          <div class="field">
+            <label for="cipherSuites">Cipher Suites</label>
+            <textarea id="cipherSuites" class="mono" rows="2" oninput="update()"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="finalMask">finalMask</label>
+            <textarea id="finalMask" class="mono" rows="6" oninput="update()"></textarea>
+          </div>
+        </div>
+      </details>
+
+      <div class="status-bar">
+        <span id="statusInfo">Paste VLESS or Trojan links to generate</span>
+      </div>
+
+      <div class="actions-grid">
+        <button type="button" class="btn btn-secondary" onclick="copyOutput()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copy
+        </button>
+        <button type="button" class="btn btn-primary" onclick="downloadOutput()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download
+        </button>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <span>Based on the <a href="https://github.com/patterniha/PattNG" target="_blank" rel="noopener noreferrer">PattNG</a> project</span>
+    </footer>
+  </div>
+
+  <div id="toast">Copied</div>
+
+  <script>
+    const TEMPLATE = {
+      "dns": {
+        "hosts": {
+          "domain:googleapis.cn": "googleapis.com",
+          "dns.alidns.com": ["223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1"],
+          "dns.sse.cisco.com": ["208.67.220.220", "208.67.222.222", "2620:119:35::35", "2620:119:53::53"],
+          "dns.umbrella.com": ["208.67.220.220", "208.67.222.222", "2620:119:35::35", "2620:119:53::53"],
+          "one.one.one.one": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
+          "1dot1dot1dot1.cloudflare-dns.com": ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"],
+          "dns.cloudflare.com": ["162.159.61.8", "172.64.41.8", "2a06:98c1:52::8", "2803:f800:53::8"],
+          "cloudflare-dns.com": ["104.16.248.249", "104.16.249.249", "2606:4700::6810:f8f9", "2606:4700::6810:f9f9"],
+          "engage.cloudflareclient.com": ["162.159.192.1", "2606:4700:d0::a29f:c001"],
+          "doh.pub": ["1.12.12.12", "120.53.53.53"],
+          "dot.pub": ["1.12.12.12", "120.53.53.53"],
+          "dns.google": ["8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844"],
+          "dns.quad9.net": ["9.9.9.9", "149.112.112.112", "2620:fe::fe", "2620:fe::9"],
+          "dns.sb": ["45.11.45.11", "185.222.222.222", "2a09::", "2a11::"],
+          "common.dot.dns.yandex.net": ["77.88.8.8", "77.88.8.1", "2a02:6b8::feed:0ff", "2a02:6b8:0:1::feed:0ff"]
+        },
+        "servers": [
+          "https://cloudflare-dns.com/dns-query",
+          {
+            "address": "223.5.5.5",
+            "domains": ["geosite:cn"],
+            "expectIPs": ["geoip:cn"],
+            "skipFallback": true,
+            "tag": "domestic-dns_cn_expect_0"
+          },
+          {
+            "address": "https://cloudflare-dns.com/dns-query",
+            "domains": ["geosite:google"]
+          },
+          {
+            "address": "223.5.5.5",
+            "domains": ["geosite:private"],
+            "skipFallback": true,
+            "tag": "domestic-dns_1_0"
+          },
+          {
+            "address": "223.5.5.5",
+            "domains": ["domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "domain:360.cn", "domain:onedns.net"],
+            "skipFallback": true,
+            "tag": "domestic-dns_2_0"
+          },
+          {
+            "address": "223.5.5.5",
+            "domains": ["geosite:cn"],
+            "skipFallback": true,
+            "tag": "domestic-dns_3_0"
+          }
+        ],
+        "tag": "dns-module"
+      },
+      "inbounds": [
+        {
+          "listen": "127.0.0.1",
+          "port": 10808,
+          "protocol": "socks",
+          "settings": {
+            "auth": "noauth",
+            "udp": true,
+            "userLevel": 8
+          },
+          "sniffing": {
+            "destOverride": ["http", "tls", "quic"],
+            "enabled": true,
+            "routeOnly": false
+          },
+          "tag": "socks"
+        },
+        {
+          "listen": "127.0.0.1",
+          "port": 10809,
+          "protocol": "http",
+          "settings": {
+            "userLevel": 8
+          },
+          "sniffing": {
+            "destOverride": ["http", "tls", "quic"],
+            "enabled": true,
+            "routeOnly": false
+          },
+          "tag": "http"
+        }
+      ],
+      "log": {
+        "loglevel": "warning"
+      },
+      "outbounds": [
+        {
+          "mux": {
+            "concurrency": -1,
+            "enabled": false
+          },
+          "protocol": "vless",
+          "settings": {
+            "address": " 188.114.97.6",
+            "encryption": "none",
+            "flow": "",
+            "id": "",
+            "level": 8,
+            "port": 443
+          },
+          "streamSettings": {
+            "finalmask": {
+              "tcp": [
+                {
+                  "type": "fragment",
+                  "settings": {
+                    "packets": "tlshello",
+                    "lengths": ["5", "94", "1"],
+                    "delays": ["0"],
+                    "maxSplit": "0"
+                  }
+                },
+                {
+                  "type": "fragment",
+                  "settings": {
+                    "packets": "1-1",
+                    "lengths": ["109", "1"],
+                    "delays": ["1"],
+                    "maxSplit": "355"
+                  }
+                }
+              ]
+            },
+            "network": "ws",
+            "security": "tls",
+            "tlsSettings": {
+              "allowInsecure": false,
+              "alpn": ["http/1.1"],
+              "cipherSuites": "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+              "fingerprint": "unsafe",
+              "serverName": ""
+            },
+            "wsSettings": {
+              "host": "",
+              "path": ""
+            }
+          },
+          "tag": "proxy"
+        },
+        {
+          "protocol": "freedom",
+          "streamSettings": {
+            "network": "tcp",
+            "sockopt": {
+              "domainStrategy": "UseIP"
+            }
+          },
+          "tag": "direct"
+        },
+        {
+          "protocol": "blackhole",
+          "settings": {},
+          "tag": "block"
+        }
+      ],
+      "remarks": "config1",
+      "routing": {
+        "domainStrategy": "AsIs",
+        "rules": [
+          {
+            "network": "udp",
+            "outboundTag": "block",
+            "port": "443",
+            "type": "field"
+          },
+          {
+            "domain": ["geosite:google"],
+            "outboundTag": "proxy",
+            "type": "field"
+          },
+          {
+            "ip": ["ext:geoip-only-cn-private.dat:private"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "domain": ["geosite:private"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "ip": [
+              "223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1",
+              "119.29.29.29", "1.12.12.12", "120.53.53.53", "2402:4e00::",
+              "2402:4e00:1::", "180.76.76.76", "2400:da00::6666", "114.114.114.114",
+              "114.114.115.115", "114.114.114.119", "114.114.115.119", "114.114.114.110",
+              "114.114.115.110", "180.184.1.1", "180.184.2.2", "101.226.4.6",
+              "218.30.118.6", "123.125.81.6", "140.207.198.6", "1.2.4.8",
+              "210.2.4.8", "52.80.66.66", "117.50.22.22", "2400:7fc0:849e:200::4",
+              "2404:c2c0:85d8:901::4", "117.50.10.10", "52.80.52.52", "2400:7fc0:849e:200::8",
+              "2404:c2c0:85d8:901::8", "117.50.60.30", "52.80.60.30"
+            ],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "domain": ["domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "domain:360.cn", "domain:onedns.net"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "ip": ["ext:geoip-only-cn-private.dat:cn"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "domain": ["geosite:cn"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "inboundTag": ["domestic-dns_1_0", "domestic-dns_2_0", "domestic-dns_3_0", "domestic-dns_cn_expect_0"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "inboundTag": ["dns-module"],
+            "outboundTag": "proxy",
+            "type": "field"
+          }
+        ]
+      }
+    };
+
+    const DEFAULT_CLEAN_IP = "188.114.97.6";
+    const DEFAULT_CIPHERS = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
+    const DEFAULT_FINALMASK = JSON.stringify({
+      "tcp": [
+        {
+          "type": "fragment",
+          "settings": {
+            "packets": "tlshello",
+            "lengths": ["5", "94", "1"],
+            "delays": ["0"],
+            "maxSplit": "0"
+          }
+        },
+        {
+          "type": "fragment",
+          "settings": {
+            "packets": "1-1",
+            "lengths": ["109", "1"],
+            "delays": ["1"],
+            "maxSplit": "355"
+          }
+        }
+      ]
+    }, null, 2);
+
+    let outputJson = "";
+    let outputCount = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('cleanIps').value = DEFAULT_CLEAN_IP;
+      document.getElementById('cipherSuites').value = DEFAULT_CIPHERS;
+      document.getElementById('finalMask').value = DEFAULT_FINALMASK;
+      update();
+    });
+
+    function setPorts(checked) {
+      document.querySelectorAll('input[name="port"]').forEach(cb => cb.checked = checked);
+      update();
+    }
+
+    function setPort443Only() {
+      document.querySelectorAll('input[name="port"]').forEach(cb => cb.checked = (cb.value === "443"));
+      update();
+    }
+
+    function handleInboundChange() {
+      const preset = document.getElementById('inboundPreset').value;
+      const custom = document.getElementById('customPort');
+      custom.style.display = (preset === 'custom') ? 'block' : 'none';
+      update();
+    }
+
+    function getSocksPort() {
+      const preset = document.getElementById('inboundPreset').value;
+      if (preset === 'custom') {
+        const val = parseInt(document.getElementById('customPort').value, 10);
+        return isNaN(val) || val <= 0 ? 10808 : val;
+      }
+      return parseInt(preset, 10);
+    }
+
+    function resetForm() {
+      document.getElementById('vlessLinks').value = "";
+      document.getElementById('cleanIps').value = DEFAULT_CLEAN_IP;
+      setPort443Only();
+      document.getElementById('inboundPreset').value = "10808";
+      document.getElementById('customPort').style.display = "none";
+      document.getElementById('customPort').value = "";
+      document.getElementById('tlsFingerprint').value = "unsafe";
+      document.getElementById('tlsAlpn').value = "http/1.1";
+      document.getElementById('cipherSuites').value = DEFAULT_CIPHERS;
+      document.getElementById('finalMask').value = DEFAULT_FINALMASK;
+      update();
+      toast("Reset to defaults");
+    }
+
+    function parseLink(url) {
+      url = url.trim();
+      let protocol = '';
+      if (url.startsWith('vless://')) protocol = 'vless';
+      else if (url.startsWith('trojan://')) protocol = 'trojan';
+      else return null;
+
+      try {
+        const [main, fragment] = url.split('#');
+        const remark = fragment ? decodeURIComponent(fragment) : '';
+        const body = main.substring(protocol.length + 3);
+        const at = body.indexOf('@');
+        if (at === -1) return null;
+
+        const auth = decodeURIComponent(body.substring(0, at));
+        const rest = body.substring(at + 1);
+        const qIdx = rest.indexOf('?');
+        const hostPort = (qIdx !== -1) ? rest.substring(0, qIdx) : rest;
+        const query = (qIdx !== -1) ? rest.substring(qIdx + 1) : '';
+
+        let hostname = hostPort;
+        let port = 443;
+        if (hostPort.includes(':')) {
+          const parts = hostPort.split(':');
+          hostname = parts[0];
+          port = parseInt(parts[1], 10) || 443;
+        }
+
+        const params = new URLSearchParams(query);
+        const encryption = params.get('encryption') || 'none';
+        const security = params.get('security') || 'tls';
+        const sni = params.get('sni') || params.get('host') || hostname;
+        const alpn = params.get('alpn') ? params.get('alpn').split(',').map(s => s.trim()) : ['http/1.1'];
+        const fp = params.get('fp') || 'chrome';
+        const type = params.get('type') || 'ws';
+        const host = params.get('host') || hostname;
+
+        let path = params.get('path') ? decodeURIComponent(params.get('path')) : '/';
+        const maxEarlyData = params.get('max_early_data') || params.get('ed');
+        if (maxEarlyData && !path.includes('ed=')) {
+          const sep = path.includes('?') ? '&' : '?';
+          path = `${path}${sep}ed=${maxEarlyData}`;
+        }
+
+        const flow = params.get('flow') || '';
+        const serviceName = params.get('serviceName') || '';
+        const mode = params.get('mode') || 'gun';
+        const pbk = params.get('pbk') || '';
+        const sid = params.get('sid') || '';
+        const spx = params.get('spx') || '';
+
+        return {
+          protocol,
+          auth,
+          hostname,
+          port,
+          encryption,
+          security,
+          sni,
+          alpn,
+          fp,
+          type,
+          host,
+          path,
+          flow,
+          serviceName,
+          mode,
+          pbk,
+          sid,
+          spx,
+          remark
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    function buildConfig(template, linkInfo, ip, port, socksPort, adv, index) {
+      const cfg = JSON.parse(JSON.stringify(template));
+
+      if (Array.isArray(cfg.inbounds)) {
+        if (cfg.inbounds[0]) cfg.inbounds[0].port = socksPort;
+        if (cfg.inbounds[1]) cfg.inbounds[1].port = socksPort + 1;
+      }
+
+      cfg.remarks = `config${index}`;
+
+      const proxy = (Array.isArray(cfg.outbounds) && cfg.outbounds.find(o => o.protocol === 'vless' || o.protocol === 'trojan' || o.tag === 'proxy')) || cfg.outbounds[0];
+      if (!proxy) return null;
+
+      proxy.protocol = linkInfo.protocol;
+      const targetAddress = ip ? ip.trim() : "188.114.97.6";
+      const targetPort = parseInt(port, 10) || 443;
+
+      if (linkInfo.protocol === 'trojan') {
+        proxy.settings = {
+          address: targetAddress,
+          port: targetPort,
+          password: linkInfo.auth,
+          servers: [
+            {
+              address: targetAddress,
+              port: targetPort,
+              password: linkInfo.auth,
+              level: 8
+            }
+          ],
+          level: 8
+        };
+      } else {
+        proxy.settings = {
+          address: targetAddress,
+          port: targetPort,
+          id: linkInfo.auth,
+          encryption: linkInfo.encryption || "none",
+          flow: linkInfo.flow || "",
+          level: 8
+        };
+      }
+
+      proxy.streamSettings = proxy.streamSettings || {};
+      proxy.streamSettings.network = linkInfo.type || "ws";
+      proxy.streamSettings.security = linkInfo.security || "tls";
+
+      if (proxy.streamSettings.security === "tls") {
+        proxy.streamSettings.tlsSettings = proxy.streamSettings.tlsSettings || {};
+        proxy.streamSettings.tlsSettings.serverName = linkInfo.sni;
+        proxy.streamSettings.tlsSettings.fingerprint = adv.fingerprint;
+        proxy.streamSettings.tlsSettings.cipherSuites = adv.cipherSuites;
+        if (adv.alpn && adv.alpn.length > 0) {
+          proxy.streamSettings.tlsSettings.alpn = adv.alpn;
+        }
+      }
+
+      if (proxy.streamSettings.network === "ws") {
+        proxy.streamSettings.wsSettings = proxy.streamSettings.wsSettings || {};
+        proxy.streamSettings.wsSettings.host = linkInfo.host;
+        proxy.streamSettings.wsSettings.path = linkInfo.path;
+      }
+
+      if (adv.finalmask) {
+        proxy.streamSettings.finalmask = adv.finalmask;
+      }
+
+      return cfg;
+    }
+
+    function safeDecodeBase64(str) {
+      try {
+        let clean = str.trim().replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+        while (clean.length % 4 !== 0) {
+          clean += '=';
+        }
+        const binary = atob(clean);
+        const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+        return new TextDecoder('utf-8').decode(bytes);
+      } catch {
+        try {
+          return atob(str.trim());
+        } catch {
+          return null;
+        }
+      }
+    }
+
+    function update() {
+      let rawInput = document.getElementById('vlessLinks').value.trim();
+      const cleanIpsRaw = document.getElementById('cleanIps').value.trim();
+
+      if (rawInput && !rawInput.includes('vless://') && !rawInput.includes('trojan://')) {
+        const decoded = safeDecodeBase64(rawInput);
+        if (decoded && (decoded.includes('vless://') || decoded.includes('trojan://'))) {
+          rawInput = decoded;
+        }
+      }
+
+      const links = rawInput.split(/\r?\n/).map(l => l.trim()).filter(l => l.startsWith('vless://') || l.startsWith('trojan://'));
+      const ips = cleanIpsRaw.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (ips.length === 0) ips.push("188.114.97.6");
+
+      const ports = Array.from(document.querySelectorAll('input[name="port"]:checked')).map(cb => cb.value);
+      if (ports.length === 0) ports.push("443");
+
+      const socksPort = getSocksPort();
+      const fingerprint = document.getElementById('tlsFingerprint').value;
+      const alpnRaw = document.getElementById('tlsAlpn').value.trim();
+      const alpn = alpnRaw ? alpnRaw.split(',').map(s => s.trim()).filter(Boolean) : ["http/1.1"];
+      const cipherSuites = document.getElementById('cipherSuites').value.trim() || DEFAULT_CIPHERS;
+
+      let finalmask = null;
+      try {
+        const rawMask = document.getElementById('finalMask').value.trim();
+        if (rawMask) finalmask = JSON.parse(rawMask);
+      } catch {}
+
+      const adv = { fingerprint, alpn, cipherSuites, finalmask };
+      const configs = [];
+      let index = 1;
+
+      for (const link of links) {
+        const parsed = parseLink(link);
+        if (!parsed) continue;
+
+        for (const ip of ips) {
+          for (const port of ports) {
+            const item = buildConfig(TEMPLATE, parsed, ip, port, socksPort, adv, index);
+            if (item) {
+              configs.push(item);
+              index++;
+            }
+          }
+        }
+      }
+
+      outputCount = configs.length;
+      outputJson = JSON.stringify(configs, null, 2);
+
+      const statusInfo = document.getElementById('statusInfo');
+      if (outputCount > 0) {
+        statusInfo.textContent = `${outputCount} configuration${outputCount !== 1 ? 's' : ''} ready`;
+      } else {
+        statusInfo.textContent = "Paste VLESS or Trojan links to generate";
+      }
+    }
+
+    function copyOutput() {
+      if (!outputJson || outputCount === 0) {
+        toast("No valid links entered");
+        return;
+      }
+
+      navigator.clipboard.writeText(outputJson).then(() => {
+        toast(`Copied ${outputCount} config${outputCount !== 1 ? 's' : ''}`);
+      }).catch(() => {
+        toast("Clipboard access failed");
+      });
+    }
+
+    function downloadOutput() {
+      if (!outputJson || outputCount === 0) {
+        toast("No valid links entered");
+        return;
+      }
+
+      const blob = new Blob([outputJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'configs.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast("Downloaded configs.json");
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2000);
+    }
+  </script>
+</body>
+</html>
