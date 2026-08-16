@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PattConfig</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card: #121215;
+      --surface: #18181b;
+      --border: #27272a;
+      --border-active: #52525b;
+      --text: #fafafa;
+      --text-dim: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #16a34a;
+      --success-hover: #15803d;
+      --ring: rgba(37, 99, 235, 0.25);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      padding: 24px 16px;
+      min-height: 100vh;
+    }
+
+    .wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    .helper {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    textarea, input[type="text"], input[type="number"], select {
+      width: 100%;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    textarea.mono, input.mono {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--border-active);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.45;
+    }
+
+    .grid-ports {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 540px) {
+      .grid-ports {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .port-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 4px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .port-item:hover {
+      border-color: var(--border-active);
+    }
+
+    .port-item input {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .btn-text:hover {
+      color: var(--text);
+    }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background-color: var(--surface);
+      margin-bottom: 18px;
+    }
+
+    summary {
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+    }
+
+    summary:hover {
+      color: var(--text);
+    }
+
+    .details-body {
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      background-color: var(--card);
+    }
+
+    .ports-inbound-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 500px) {
+      .ports-inbound-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 440px) {
+      .actions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    button.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.12s ease, transform 0.08s ease;
+    }
+
+    button.btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--surface);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #27272a;
+      border-color: var(--border-active);
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 10px 14px;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-top: 14px;
+    }
+
+    .status-count {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--border-active);
+      transition: color 0.12s ease, border-bottom-color 0.12s ease;
+    }
+
+    .footer a:hover {
+      color: var(--text);
+      border-bottom-color: var(--text);
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--surface);
+      border: 1px solid var(--border-active);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1>PattConfig</h1>
+      <button type="button" class="btn-text" onclick="resetForm()">Clear</button>
+    </header>
+
+    <div class="card">
+      <div class="field">
+        <div class="field-header">
+          <label for="vlessLinks">Configs / Links / Subscriptions</label>
+        </div>
+        <textarea id="vlessLinks" class="mono" rows="4" placeholder="vless://, trojan://, sub URL, or Xray JSON" oninput="update()"></textarea>
+        <div class="quick-actions" style="margin-top: 6px;">
+          <button type="button" id="fetchBtn" class="btn-text" onclick="fetchSubscription()" style="display: none;">Fetch URL</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="cleanIps">Clean IP / Domain</label>
+        </div>
+        <textarea id="cleanIps" class="mono" rows="2" placeholder="Optional (e.g. www.speedtest.net, 104.21.33.59)" oninput="update()"></textarea>
+        <div class="quick-actions" style="margin-top: 6px;">
+          <button type="button" class="btn-text" onclick="loadVerifiedEndpoints()">Load Sample Clean IPs</button>
+          <button type="button" class="btn-text" onclick="fetchOnlineCleanIps()">Fetch Online Clean IPs</button>
+        </div>
+        <div style="margin-top: 6px;">
+          <label for="ignoreOriginalIp" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; user-select: none;">
+            <input type="checkbox" id="ignoreOriginalIp" aria-label="Only use Clean IPs (Ignore original endpoints)" onchange="update()" style="accent-color: var(--accent); cursor: pointer;">
+            Only use Clean IPs (Ignore original endpoints)
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label>Cloudflare Ports</label>
+          <div class="quick-actions">
+            <button type="button" class="btn-text" onclick="setPorts(true)">Select All</button>
+            <button type="button" class="btn-text" onclick="setPort443Only()">443 Only</button>
+          </div>
+        </div>
+        <div class="grid-ports">
+          <label for="port-443" class="port-item"><input type="checkbox" id="port-443" name="port" value="443" aria-label="Port 443" checked onchange="update()"> 443</label>
+          <label for="port-8443" class="port-item"><input type="checkbox" id="port-8443" name="port" value="8443" aria-label="Port 8443" onchange="update()"> 8443</label>
+          <label for="port-2053" class="port-item"><input type="checkbox" id="port-2053" name="port" value="2053" aria-label="Port 2053" onchange="update()"> 2053</label>
+          <label for="port-2083" class="port-item"><input type="checkbox" id="port-2083" name="port" value="2083" aria-label="Port 2083" onchange="update()"> 2083</label>
+          <label for="port-2087" class="port-item"><input type="checkbox" id="port-2087" name="port" value="2087" aria-label="Port 2087" onchange="update()"> 2087</label>
+          <label for="port-2096" class="port-item"><input type="checkbox" id="port-2096" name="port" value="2096" aria-label="Port 2096" onchange="update()"> 2096</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label>Routing Rules</label>
+        </div>
+        <div class="grid-ports" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
+          <label for="bypassIran" class="port-item"><input type="checkbox" id="bypassIran" aria-label="Bypass Iran" onchange="update()"> Bypass Iran</label>
+          <label for="blockQuic" class="port-item"><input type="checkbox" id="blockQuic" aria-label="Block QUIC" onchange="update()"> Block QUIC</label>
+          <label for="blockAds" class="port-item"><input type="checkbox" id="blockAds" aria-label="Block Ads" onchange="update()"> Block Ads</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="directDomains">Custom Direct Domains</label>
+        </div>
+        <textarea id="directDomains" class="mono" rows="2" placeholder="Optional (e.g. domain:shaparak.ir, site.com)" oninput="update()"></textarea>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label>DNS Servers</label>
+        </div>
+        <div class="ports-inbound-row">
+          <div>
+            <label for="remoteDns" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Remote DNS</label>
+            <input type="text" id="remoteDns" class="mono" value="https://8.8.8.8/dns-query" oninput="update()">
+          </div>
+          <div>
+            <label for="domesticDns" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Domestic DNS</label>
+            <input type="text" id="domesticDns" class="mono" value="8.8.8.8" oninput="update()">
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-header">
+          <label for="inboundPreset">Inbound Proxy Port</label>
+        </div>
+        <div class="ports-inbound-row">
+          <select id="inboundPreset" onchange="handleInboundChange()">
+            <option value="10808" selected>10808 (Mixed)</option>
+            <option value="2080">2080 (Mixed)</option>
+            <option value="custom">Custom Port...</option>
+          </select>
+          <input type="number" id="customPort" class="mono" style="display:none;" placeholder="Proxy Port" min="1024" max="65534" oninput="update()">
+        </div>
+        <div style="margin-top: 6px;">
+          <label for="allowLan" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; user-select: none;">
+            <input type="checkbox" id="allowLan" aria-label="Allow LAN (Share with devices on local Wi-Fi)" onchange="update()" style="accent-color: var(--accent); cursor: pointer;">
+            Allow LAN (Share with devices on local Wi-Fi)
+          </label>
+        </div>
+      </div>
+
+      <details id="advancedSection">
+        <summary>Advanced Options</summary>
+        <div class="details-body">
+          <div class="field">
+            <label for="tlsFingerprint">TLS Fingerprint</label>
+            <select id="tlsFingerprint" onchange="update()">
+              <option value="unsafe" selected>unsafe</option>
+              <option value="chrome">chrome</option>
+              <option value="firefox">firefox</option>
+              <option value="safari">safari</option>
+              <option value="ios">ios</option>
+              <option value="android">android</option>
+              <option value="edge">edge</option>
+              <option value="360">360</option>
+              <option value="qq">qq</option>
+              <option value="random">random</option>
+              <option value="randomized">randomized</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="tlsAlpn">ALPN</label>
+            <input type="text" id="tlsAlpn" class="mono" value="http/1.1" oninput="update()">
+          </div>
+
+          <div class="field">
+            <label for="cipherSuites">Cipher Suites</label>
+            <textarea id="cipherSuites" class="mono" rows="2" oninput="update()"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="finalMask">finalMask</label>
+            <textarea id="finalMask" class="mono" rows="6" oninput="update()"></textarea>
+          </div>
+        </div>
+      </details>
+
+      <div class="status-bar">
+        <span id="statusInfo">Paste VLESS or Trojan links to generate</span>
+      </div>
+
+      <div class="actions-grid">
+        <button type="button" class="btn btn-secondary" onclick="copyOutput()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copy
+        </button>
+        <button type="button" class="btn btn-primary" onclick="downloadOutput()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download
+        </button>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <span>Based on the <a href="https://github.com/patterniha/PattNG" target="_blank" rel="noopener noreferrer">PattNG</a> project · Clean IPs by <a href="https://github.com/NiREvil/vless" target="_blank" rel="noopener noreferrer">NiREvil</a></span>
+    </footer>
+  </div>
+
+  <div id="toast">Copied</div>
+
+  <script>
+    const TEMPLATE = {
+      "dns": {
+        "queryStrategy": "UseIP",
+        "servers": [
+          {
+            "address": "https://8.8.8.8/dns-query",
+            "tag": "remote-dns"
+          },
+          {
+            "address": "8.8.8.8",
+            "domains": [
+              "geosite:category-ir"
+            ],
+            "expectIPs": [
+              "geoip:ir"
+            ],
+            "skipFallback": true,
+            "tag": "domestic-dns"
+          }
+        ],
+        "tag": "dns"
+      },
+      "inbounds": [
+        {
+          "listen": "127.0.0.1",
+          "port": 10808,
+          "protocol": "mixed",
+          "settings": {
+            "auth": "noauth",
+            "udp": true,
+            "userLevel": 8
+          },
+          "sniffing": {
+            "destOverride": ["http", "tls", "quic"],
+            "enabled": true,
+            "routeOnly": false
+          },
+          "tag": "mixed-in"
+        }
+      ],
+      "log": {
+        "loglevel": "warning"
+      },
+      "outbounds": [
+        {
+          "mux": {
+            "concurrency": -1,
+            "enabled": false
+          },
+          "protocol": "vless",
+          "settings": {
+            "address": "104.21.33.59",
+            "encryption": "none",
+            "flow": "",
+            "id": "",
+            "level": 8,
+            "port": 443
+          },
+          "streamSettings": {
+            "finalmask": {
+              "tcp": [
+                {
+                  "type": "fragment",
+                  "settings": {
+                    "packets": "tlshello",
+                    "lengths": ["0", "104", "1"],
+                    "delays": ["0"],
+                    "maxSplit": "0"
+                  }
+                },
+                {
+                  "type": "fragment",
+                  "settings": {
+                    "packets": "1-1",
+                    "lengths": ["114", "1"],
+                    "delays": ["1"],
+                    "maxSplit": "11"
+                  }
+                }
+              ]
+            },
+            "network": "ws",
+            "security": "tls",
+            "tlsSettings": {
+              "allowInsecure": false,
+              "alpn": ["http/1.1"],
+              "cipherSuites": "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+              "fingerprint": "unsafe",
+              "serverName": ""
+            },
+            "wsSettings": {
+              "host": "",
+              "path": ""
+            }
+          },
+          "tag": "proxy"
+        },
+        {
+          "protocol": "freedom",
+          "streamSettings": {
+            "network": "tcp",
+            "sockopt": {
+              "domainStrategy": "UseIP"
+            }
+          },
+          "tag": "direct"
+        },
+        {
+          "protocol": "blackhole",
+          "settings": {},
+          "tag": "block"
+        }
+      ],
+      "remarks": "config1",
+      "routing": {
+        "domainStrategy": "AsIs",
+        "rules": [
+          {
+            "network": "udp",
+            "outboundTag": "block",
+            "port": "443",
+            "type": "field"
+          },
+          {
+            "domain": ["geosite:google"],
+            "outboundTag": "proxy",
+            "type": "field"
+          },
+          {
+            "ip": ["ext:geoip-only-cn-private.dat:private"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "domain": ["geosite:private"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "ip": [
+              "223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1",
+              "119.29.29.29", "1.12.12.12", "120.53.53.53", "2402:4e00::",
+              "2402:4e00:1::", "180.76.76.76", "2400:da00::6666", "114.114.114.114",
+              "114.114.115.115", "114.114.114.119", "114.114.115.119", "114.114.114.110",
+              "114.114.115.110", "180.184.1.1", "180.184.2.2", "101.226.4.6",
+              "218.30.118.6", "123.125.81.6", "140.207.198.6", "1.2.4.8",
+              "210.2.4.8", "52.80.66.66", "117.50.22.22", "2400:7fc0:849e:200::4",
+              "2404:c2c0:85d8:901::4", "117.50.10.10", "52.80.52.52", "2400:7fc0:849e:200::8",
+              "2404:c2c0:85d8:901::8", "117.50.60.30", "52.80.60.30"
+            ],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "domain": ["domain:alidns.com", "domain:doh.pub", "domain:dot.pub", "domain:360.cn", "domain:onedns.net"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "ip": ["ext:geoip-only-cn-private.dat:cn"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "domain": ["geosite:cn"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "inboundTag": ["domestic-dns_1_0", "domestic-dns_2_0", "domestic-dns_3_0", "domestic-dns_cn_expect_0"],
+            "outboundTag": "direct",
+            "type": "field"
+          },
+          {
+            "inboundTag": ["dns-module"],
+            "outboundTag": "proxy",
+            "type": "field"
+          }
+        ]
+      }
+    };
+
+    const DEFAULT_CLEAN_IP = "104.21.33.59";
+    const DEFAULT_REMOTE_DNS = "https://8.8.8.8/dns-query";
+    const DEFAULT_DOMESTIC_DNS = "8.8.8.8";
+    const ONLINE_CLEAN_IPS_URL = "https://raw.githubusercontent.com/NiREvil/vless/main/Cloudflare-IPs.json";
+    const VERIFIED_ENDPOINTS = [
+      "www.speedtest.net",
+      "chatgpt.com",
+      "chat.openai.com",
+      "www.wto.org",
+      "nodejs.org",
+      "2027.victoriacross.ir",
+      "yakamoz.nscl.ir",
+      "104.21.33.59",
+      "104.18.123.18",
+      "104.18.123.21",
+      "104.21.0.227",
+      "104.21.40.34",
+      "172.64.152.23",
+      "172.67.142.152",
+      "172.67.201.77",
+      "188.114.96.3",
+      "188.114.97.3",
+      "205.233.181.229",
+      "205.233.181.241",
+      "205.233.181.254"
+    ].join('\n');
+    const DEFAULT_CIPHERS = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
+    const DEFAULT_FINALMASK = JSON.stringify({
+      "tcp": [
+        {
+          "type": "fragment",
+          "settings": {
+            "packets": "tlshello",
+            "lengths": ["0", "104", "1"],
+            "delays": ["0"],
+            "maxSplit": "0"
+          }
+        },
+        {
+          "type": "fragment",
+          "settings": {
+            "packets": "1-1",
+            "lengths": ["114", "1"],
+            "delays": ["1"],
+            "maxSplit": "11"
+          }
+        }
+      ]
+    }, null, 2);
+
+    let outputJson = "";
+    let outputCount = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('cleanIps').value = "";
+      document.getElementById('ignoreOriginalIp').checked = false;
+      if (document.getElementById('bypassIran')) document.getElementById('bypassIran').checked = false;
+      if (document.getElementById('blockQuic')) document.getElementById('blockQuic').checked = false;
+      if (document.getElementById('blockAds')) document.getElementById('blockAds').checked = false;
+      if (document.getElementById('directDomains')) document.getElementById('directDomains').value = "";
+      if (document.getElementById('allowLan')) document.getElementById('allowLan').checked = false;
+      const fetchBtn = document.getElementById('fetchBtn');
+      if (fetchBtn) fetchBtn.style.display = 'none';
+      if (document.getElementById('remoteDns')) document.getElementById('remoteDns').value = DEFAULT_REMOTE_DNS;
+      if (document.getElementById('domesticDns')) document.getElementById('domesticDns').value = DEFAULT_DOMESTIC_DNS;
+      document.getElementById('cipherSuites').value = DEFAULT_CIPHERS;
+      document.getElementById('finalMask').value = DEFAULT_FINALMASK;
+      update();
+    });
+
+    function loadVerifiedEndpoints() {
+      document.getElementById('cleanIps').value = VERIFIED_ENDPOINTS;
+      update();
+      toast("Loaded sample clean IPs");
+    }
+
+    async function fetchOnlineCleanIps() {
+      toast("Fetching online clean IPs...");
+      try {
+        const raw = await fetchUrlContent(ONLINE_CLEAN_IPS_URL);
+        if (!raw) {
+          toast("Failed to fetch online clean IPs");
+          return;
+        }
+        const data = JSON.parse(raw);
+        let ips = [];
+        if (Array.isArray(data.ipv4)) {
+          ips = data.ipv4.map(item => item.ip).filter(Boolean);
+        } else if (Array.isArray(data)) {
+          ips = data.map(item => item.ip || item).filter(Boolean);
+        }
+        if (ips.length === 0) {
+          toast("No clean IPs found in online source");
+          return;
+        }
+        document.getElementById('cleanIps').value = ips.join('\n');
+        update();
+        toast(`Loaded ${ips.length} online clean IPs`);
+      } catch {
+        toast("Failed to parse online clean IPs");
+      }
+    }
+
+    function setPorts(checked) {
+      document.querySelectorAll('input[name="port"]').forEach(cb => cb.checked = checked);
+      update();
+    }
+
+    function setPort443Only() {
+      document.querySelectorAll('input[name="port"]').forEach(cb => cb.checked = (cb.value === "443"));
+      update();
+    }
+
+    function handleInboundChange() {
+      const preset = document.getElementById('inboundPreset').value;
+      const custom = document.getElementById('customPort');
+      custom.style.display = (preset === 'custom') ? 'block' : 'none';
+      update();
+    }
+
+    function getSocksPort() {
+      const preset = document.getElementById('inboundPreset').value;
+      if (preset === 'custom') {
+        const val = parseInt(document.getElementById('customPort').value, 10);
+        return isNaN(val) || val <= 0 ? 10808 : val;
+      }
+      return parseInt(preset, 10);
+    }
+
+    function resetForm() {
+      document.getElementById('vlessLinks').value = "";
+      document.getElementById('cleanIps').value = "";
+      document.getElementById('ignoreOriginalIp').checked = false;
+      if (document.getElementById('bypassIran')) document.getElementById('bypassIran').checked = false;
+      if (document.getElementById('blockQuic')) document.getElementById('blockQuic').checked = false;
+      if (document.getElementById('blockAds')) document.getElementById('blockAds').checked = false;
+      if (document.getElementById('directDomains')) document.getElementById('directDomains').value = "";
+      if (document.getElementById('allowLan')) document.getElementById('allowLan').checked = false;
+      const fetchBtn = document.getElementById('fetchBtn');
+      if (fetchBtn) fetchBtn.style.display = 'none';
+      setPort443Only();
+      document.getElementById('inboundPreset').value = "10808";
+      document.getElementById('customPort').style.display = "none";
+      document.getElementById('customPort').value = "";
+      if (document.getElementById('remoteDns')) document.getElementById('remoteDns').value = DEFAULT_REMOTE_DNS;
+      if (document.getElementById('domesticDns')) document.getElementById('domesticDns').value = DEFAULT_DOMESTIC_DNS;
+      document.getElementById('tlsFingerprint').value = "unsafe";
+      document.getElementById('tlsAlpn').value = "http/1.1";
+      document.getElementById('cipherSuites').value = DEFAULT_CIPHERS;
+      document.getElementById('finalMask').value = DEFAULT_FINALMASK;
+      update();
+      toast("Reset to defaults");
+    }
+
+    function cleanJinaContent(text) {
+      if (!text) return '';
+      const mdIdx = text.indexOf('Markdown Content:');
+      let body = mdIdx !== -1 ? text.substring(mdIdx + 'Markdown Content:'.length).trim() : text.trim();
+      body = body.replace(/^```[a-zA-Z0-9_-]*\s*\r?\n/, '').replace(/\r?\n```\s*$/, '').trim();
+      return body;
+    }
+
+    async function fetchUrlContent(rawUrl) {
+      const url = rawUrl.trim().split('#')[0].trim();
+      if (!url) return '';
+
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+        if (res.ok) {
+          const text = await res.text();
+          if (text && text.trim()) return text.trim();
+        }
+      } catch {}
+
+      const proxyEndpoints = [
+        { url: 'https://r.jina.ai/' + url, isJina: true },
+        { url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url), isJina: false },
+        { url: 'https://api.allorigins.win/get?url=' + encodeURIComponent(url), isJson: true },
+        { url: 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url), isJina: false }
+      ];
+
+      for (const p of proxyEndpoints) {
+        try {
+          const res = await fetch(p.url, { signal: AbortSignal.timeout(6000) });
+          if (res.ok) {
+            if (p.isJson) {
+              const json = await res.json();
+              if (json && json.contents) return json.contents.trim();
+            } else {
+              const text = await res.text();
+              if (text) {
+                const body = p.isJina ? cleanJinaContent(text) : text.trim();
+                if (body) return body;
+              }
+            }
+          }
+        } catch {}
+      }
+      return '';
+    }
+
+    async function fetchSubscription() {
+      const currentVal = document.getElementById('vlessLinks').value.trim();
+      let urls = [];
+      if (currentVal.includes('http://') || currentVal.includes('https://')) {
+        const tokens = currentVal.split(/[\r\n\s,;]+/);
+        urls = tokens.filter(t => t.startsWith('http://') || t.startsWith('https://'));
+      }
+      if (urls.length === 0) {
+        const promptVal = window.prompt("Enter Subscription or Config URL:");
+        if (promptVal) {
+          urls = promptVal.split(/[\r\n\s,;]+/).filter(t => t.startsWith('http://') || t.startsWith('https://'));
+        }
+      }
+      if (urls.length === 0) return;
+
+      toast("Fetching subscription...");
+
+      const results = [];
+      for (const u of urls) {
+        const content = await fetchUrlContent(u);
+        if (content) {
+          results.push(content);
+        }
+      }
+
+      if (results.length === 0) {
+        toast("Failed to fetch subscription URL");
+        return;
+      }
+
+      document.getElementById('vlessLinks').value = results.join('\n');
+      update();
+      toast("Subscription loaded");
+    }
+
+    function parseLink(url) {
+      url = url.trim();
+      let protocol = '';
+      if (url.startsWith('vless://')) protocol = 'vless';
+      else if (url.startsWith('trojan://')) protocol = 'trojan';
+      else return null;
+
+      try {
+        const [main, fragment] = url.split('#');
+        const remark = fragment ? decodeURIComponent(fragment) : '';
+        const body = main.substring(protocol.length + 3);
+        const at = body.indexOf('@');
+        if (at === -1) return null;
+
+        const auth = decodeURIComponent(body.substring(0, at));
+        const rest = body.substring(at + 1);
+        const qIdx = rest.indexOf('?');
+        const hostPort = (qIdx !== -1) ? rest.substring(0, qIdx) : rest;
+        const query = (qIdx !== -1) ? rest.substring(qIdx + 1) : '';
+
+        let hostname = hostPort;
+        let port = 443;
+        if (hostPort.startsWith('[')) {
+          const bracketIndex = hostPort.indexOf(']');
+          if (bracketIndex !== -1) {
+            hostname = hostPort.substring(1, bracketIndex);
+            const afterBracket = hostPort.substring(bracketIndex + 1);
+            if (afterBracket.startsWith(':')) {
+              port = parseInt(afterBracket.substring(1), 10) || 443;
+            }
+          }
+        } else if (hostPort.includes(':')) {
+          const parts = hostPort.split(':');
+          if (parts.length === 2) {
+            hostname = parts[0];
+            port = parseInt(parts[1], 10) || 443;
+          }
+        }
+
+        const params = new URLSearchParams(query);
+        const encryption = params.get('encryption') || 'none';
+        const security = params.get('security') || 'tls';
+        const sni = params.get('sni') || params.get('host') || hostname;
+        const alpn = params.get('alpn') ? params.get('alpn').split(',').map(s => s.trim()) : ['http/1.1'];
+        const fp = params.get('fp') || 'chrome';
+        const type = params.get('type') || 'ws';
+        const host = params.get('host') || hostname;
+
+        let path = params.get('path') ? decodeURIComponent(params.get('path')) : '/';
+        const maxEarlyData = params.get('max_early_data') || params.get('ed');
+        if (maxEarlyData && !path.includes('ed=')) {
+          const sep = path.includes('?') ? '&' : '?';
+          path = `${path}${sep}ed=${maxEarlyData}`;
+        }
+
+        const flow = params.get('flow') || '';
+        const serviceName = params.get('serviceName') || '';
+        const mode = params.get('mode') || 'gun';
+        const pbk = params.get('pbk') || '';
+        const sid = params.get('sid') || '';
+        const spx = params.get('spx') || '';
+
+        return {
+          protocol,
+          auth,
+          hostname,
+          port,
+          encryption,
+          security,
+          sni,
+          alpn,
+          fp,
+          type,
+          host,
+          path,
+          flow,
+          serviceName,
+          mode,
+          pbk,
+          sid,
+          spx,
+          remark
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    function parseRawJson(text) {
+      try {
+        const data = JSON.parse(text);
+        const results = [];
+
+        function extractOutbounds(obj) {
+          if (!obj || typeof obj !== 'object') return;
+          if (Array.isArray(obj)) {
+            for (const item of obj) extractOutbounds(item);
+            return;
+          }
+          if (Array.isArray(obj.outbounds)) {
+            for (const ob of obj.outbounds) extractOutbounds(ob);
+            return;
+          }
+          const proto = (obj.protocol || '').toLowerCase();
+          if (proto === 'vless' || proto === 'trojan') {
+            const stream = obj.streamSettings || {};
+            const tls = stream.tlsSettings || {};
+            const ws = stream.wsSettings || {};
+            const vnext = obj.settings?.vnext?.[0];
+            const server = obj.settings?.servers?.[0];
+            const user = vnext?.users?.[0];
+
+            const auth = user?.id || obj.settings?.id || server?.password || obj.settings?.password || '';
+            const hostname = vnext?.address || obj.settings?.address || server?.address || '';
+            const port = vnext?.port || obj.settings?.port || server?.port || 443;
+            const encryption = user?.encryption || obj.settings?.encryption || 'none';
+            const flow = user?.flow || obj.settings?.flow || '';
+            const security = stream.security || 'tls';
+            const type = stream.network || 'ws';
+            const sni = tls.serverName || hostname;
+            const alpn = Array.isArray(tls.alpn) ? tls.alpn : ['http/1.1'];
+            const fp = tls.fingerprint || 'unsafe';
+            const host = ws.headers?.Host || ws.headers?.host || ws.host || hostname;
+            const path = ws.path || '/';
+            const remark = obj.tag || '';
+
+            if (auth && hostname) {
+              results.push({
+                protocol: proto,
+                auth,
+                hostname,
+                port,
+                encryption,
+                security,
+                sni,
+                alpn,
+                fp,
+                type,
+                host,
+                path,
+                flow,
+                remark
+              });
+            }
+          }
+        }
+
+        extractOutbounds(data);
+        return results;
+      } catch {
+        return [];
+      }
+    }
+
+    function buildConfig(template, linkInfo, ip, port, socksPort, adv, index, totalCount) {
+      const cfg = JSON.parse(JSON.stringify(template));
+
+      if (cfg.dns && Array.isArray(cfg.dns.servers)) {
+        const remoteServer = cfg.dns.servers.find(s => s.tag === 'remote-dns');
+        if (remoteServer && adv.remoteDns) {
+          remoteServer.address = adv.remoteDns;
+        }
+        const domesticServer = cfg.dns.servers.find(s => s.tag === 'domestic-dns');
+        if (domesticServer && adv.domesticDns) {
+          domesticServer.address = adv.domesticDns;
+        }
+      }
+
+      if (Array.isArray(cfg.inbounds) && cfg.inbounds[0]) {
+        cfg.inbounds[0].port = socksPort;
+        cfg.inbounds[0].listen = adv.allowLan ? "0.0.0.0" : "127.0.0.1";
+      }
+
+      const protoUpper = (linkInfo.protocol || 'vless').toUpperCase();
+      const targetAddress = ip ? ip.trim() : "104.21.33.59";
+      const targetPort = parseInt(port, 10) || 443;
+
+      if (totalCount > 1) {
+        cfg.remarks = `${protoUpper} ${index}, ${targetAddress}:${targetPort}`;
+      } else {
+        cfg.remarks = `${protoUpper}, ${targetAddress}:${targetPort}`;
+      }
+
+      const proxy = (Array.isArray(cfg.outbounds) && cfg.outbounds.find(o => o.protocol === 'vless' || o.protocol === 'trojan' || o.tag === 'proxy')) || cfg.outbounds[0];
+      if (!proxy) return null;
+
+      proxy.protocol = linkInfo.protocol;
+
+      if (linkInfo.protocol === 'trojan') {
+        proxy.settings = {
+          address: targetAddress,
+          port: targetPort,
+          password: linkInfo.auth,
+          servers: [
+            {
+              address: targetAddress,
+              port: targetPort,
+              password: linkInfo.auth,
+              level: 8
+            }
+          ],
+          level: 8
+        };
+      } else {
+        proxy.settings = {
+          address: targetAddress,
+          port: targetPort,
+          id: linkInfo.auth,
+          encryption: linkInfo.encryption || "none",
+          flow: linkInfo.flow || "",
+          vnext: [
+            {
+              address: targetAddress,
+              port: targetPort,
+              users: [
+                {
+                  id: linkInfo.auth,
+                  encryption: linkInfo.encryption || "none",
+                  flow: linkInfo.flow || "",
+                  level: 8
+                }
+              ]
+            }
+          ],
+          level: 8
+        };
+      }
+
+      proxy.streamSettings = proxy.streamSettings || {};
+      proxy.streamSettings.network = linkInfo.type || "ws";
+      proxy.streamSettings.security = linkInfo.security || "tls";
+
+      if (proxy.streamSettings.security === "tls") {
+        proxy.streamSettings.tlsSettings = proxy.streamSettings.tlsSettings || {};
+        proxy.streamSettings.tlsSettings.serverName = linkInfo.sni;
+        proxy.streamSettings.tlsSettings.fingerprint = adv.fingerprint;
+        proxy.streamSettings.tlsSettings.cipherSuites = adv.cipherSuites;
+        if (adv.alpn && adv.alpn.length > 0) {
+          proxy.streamSettings.tlsSettings.alpn = adv.alpn;
+        }
+      }
+
+      if (proxy.streamSettings.network === "ws") {
+        proxy.streamSettings.wsSettings = proxy.streamSettings.wsSettings || {};
+        proxy.streamSettings.wsSettings.host = linkInfo.host;
+        proxy.streamSettings.wsSettings.path = linkInfo.path;
+        if (linkInfo.host) {
+          proxy.streamSettings.wsSettings.headers = {
+            "Host": linkInfo.host
+          };
+        }
+      }
+
+      if (adv.finalmask) {
+        proxy.streamSettings.finalmask = adv.finalmask;
+      }
+
+      const rules = [];
+      if (adv.blockQuic) {
+        rules.push({
+          "type": "field",
+          "outboundTag": "block",
+          "port": "443",
+          "network": "udp"
+        });
+      }
+      if (adv.blockAds) {
+        rules.push({
+          "type": "field",
+          "outboundTag": "block",
+          "domain": ["geosite:category-ads-all"]
+        });
+      }
+      if (adv.bypassIran) {
+        rules.push({
+          "type": "field",
+          "outboundTag": "direct",
+          "ip": ["geoip:private", "geoip:ir"]
+        });
+        rules.push({
+          "type": "field",
+          "outboundTag": "direct",
+          "domain": ["geosite:category-ir", "domain:ir"]
+        });
+      } else {
+        rules.push({
+          "type": "field",
+          "outboundTag": "direct",
+          "ip": ["geoip:private"]
+        });
+        rules.push({
+          "type": "field",
+          "outboundTag": "direct",
+          "domain": ["geosite:private"]
+        });
+      }
+
+      if (Array.isArray(adv.directDomains) && adv.directDomains.length > 0) {
+        rules.push({
+          "type": "field",
+          "outboundTag": "direct",
+          "domain": adv.directDomains
+        });
+      }
+
+      rules.push({
+        "type": "field",
+        "inboundTag": ["domestic-dns"],
+        "outboundTag": "direct"
+      });
+
+      rules.push({
+        "type": "field",
+        "inboundTag": ["dns"],
+        "outboundTag": "proxy"
+      });
+
+      cfg.routing = cfg.routing || {};
+      cfg.routing.domainStrategy = "AsIs";
+      cfg.routing.rules = rules;
+
+      return cfg;
+    }
+
+    function safeDecodeBase64(str) {
+      try {
+        let clean = str.trim().replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+        while (clean.length % 4 !== 0) {
+          clean += '=';
+        }
+        const binary = atob(clean);
+        const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+        return new TextDecoder('utf-8').decode(bytes);
+      } catch {
+        try {
+          return atob(str.trim());
+        } catch {
+          return null;
+        }
+      }
+    }
+
+    function update() {
+      const rawInput = document.getElementById('vlessLinks').value.trim();
+      const cleanIpsRaw = document.getElementById('cleanIps').value.trim();
+      const ignoreOriginal = document.getElementById('ignoreOriginalIp') ? document.getElementById('ignoreOriginalIp').checked : false;
+      const bypassIran = document.getElementById('bypassIran') ? document.getElementById('bypassIran').checked : false;
+      const blockQuic = document.getElementById('blockQuic') ? document.getElementById('blockQuic').checked : false;
+      const blockAds = document.getElementById('blockAds') ? document.getElementById('blockAds').checked : false;
+      const allowLan = document.getElementById('allowLan') ? document.getElementById('allowLan').checked : false;
+      const directDomainsRaw = document.getElementById('directDomains') ? document.getElementById('directDomains').value.trim() : '';
+
+      let parsedLinks = [];
+
+      if (rawInput.startsWith('{') || rawInput.startsWith('[')) {
+        parsedLinks = parseRawJson(rawInput);
+      }
+
+      if (parsedLinks.length === 0) {
+        let rawLines = rawInput.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        let expandedLinks = [];
+        for (const line of rawLines) {
+          if (line.startsWith('vless://') || line.startsWith('trojan://')) {
+            expandedLinks.push(line);
+          } else if (line.startsWith('{') || line.startsWith('[')) {
+            const jsonItems = parseRawJson(line);
+            parsedLinks.push(...jsonItems);
+          } else {
+            const decoded = safeDecodeBase64(line);
+            if (decoded) {
+              if (decoded.trim().startsWith('{') || decoded.trim().startsWith('[')) {
+                const jsonItems = parseRawJson(decoded.trim());
+                parsedLinks.push(...jsonItems);
+              } else if (decoded.includes('vless://') || decoded.includes('trojan://')) {
+                const inner = decoded.split(/\r?\n/).map(l => l.trim()).filter(l => l.startsWith('vless://') || l.startsWith('trojan://'));
+                expandedLinks.push(...inner);
+              }
+            }
+          }
+        }
+        const fromUrls = expandedLinks.map(parseLink).filter(Boolean);
+        parsedLinks.push(...fromUrls);
+      }
+
+      const customIps = cleanIpsRaw
+        .split(/[\r\n,;\s]+/)
+        .map(l => {
+          let s = l.trim().replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+          if (s.startsWith('[') && s.includes(']')) {
+            s = s.substring(1, s.indexOf(']'));
+          } else if (!s.startsWith('[') && s.includes(':')) {
+            const parts = s.split(':');
+            if (parts.length === 2) s = parts[0];
+          }
+          return s;
+        })
+        .filter(l => l.length > 0);
+
+      const directDomains = directDomainsRaw
+        .split(/[\r\n,;\s]+/)
+        .map(d => d.trim().replace(/^https?:\/\//i, '').replace(/\/+$/, ''))
+        .filter(d => d.length > 0);
+
+      const ports = Array.from(document.querySelectorAll('input[name="port"]:checked')).map(cb => cb.value);
+      if (ports.length === 0) ports.push("443");
+
+      const socksPort = getSocksPort();
+      const fingerprint = document.getElementById('tlsFingerprint').value;
+      const alpnRaw = document.getElementById('tlsAlpn').value.trim();
+      const alpn = alpnRaw ? alpnRaw.split(',').map(s => s.trim()).filter(Boolean) : ["http/1.1"];
+      const cipherSuites = document.getElementById('cipherSuites').value.trim() || DEFAULT_CIPHERS;
+
+      let finalmask = null;
+      try {
+        const rawMask = document.getElementById('finalMask').value.trim();
+        if (rawMask) finalmask = JSON.parse(rawMask);
+      } catch {}
+
+      const remoteDns = (document.getElementById('remoteDns') ? document.getElementById('remoteDns').value.trim() : '') || DEFAULT_REMOTE_DNS;
+      const domesticDns = (document.getElementById('domesticDns') ? document.getElementById('domesticDns').value.trim() : '') || DEFAULT_DOMESTIC_DNS;
+
+      const adv = {
+        fingerprint,
+        alpn,
+        cipherSuites,
+        finalmask,
+        allowLan,
+        bypassIran,
+        blockQuic,
+        blockAds,
+        directDomains,
+        remoteDns,
+        domesticDns
+      };
+
+      const groups = [];
+      for (const item of parsedLinks) {
+        const sig = [
+          item.protocol,
+          item.auth,
+          (item.host || '').toLowerCase(),
+          (item.sni || '').toLowerCase(),
+          item.type,
+          item.security,
+          item.flow || ''
+        ].join('|');
+
+        let grp = groups.find(g => g.signature === sig);
+        if (!grp) {
+          grp = {
+            signature: sig,
+            base: item,
+            endpoints: [],
+            linkMap: new Map()
+          };
+          groups.push(grp);
+        }
+
+        if (item.hostname && !grp.endpoints.includes(item.hostname)) {
+          grp.endpoints.push(item.hostname);
+          grp.linkMap.set(item.hostname, item);
+        }
+      }
+
+      const buildPlan = [];
+      for (const grp of groups) {
+        const targetEndpoints = [];
+
+        if (!ignoreOriginal) {
+          for (const ep of grp.endpoints) {
+            if (!targetEndpoints.includes(ep)) {
+              targetEndpoints.push(ep);
+            }
+          }
+        }
+
+        for (const cip of customIps) {
+          if (!targetEndpoints.includes(cip)) {
+            targetEndpoints.push(cip);
+          }
+        }
+
+        if (targetEndpoints.length === 0 && grp.endpoints.length > 0) {
+          targetEndpoints.push(grp.endpoints[0]);
+        }
+
+        for (const ep of targetEndpoints) {
+          const linkInfo = grp.linkMap.get(ep) || grp.base;
+          for (const port of ports) {
+            buildPlan.push({ linkInfo, ep, port });
+          }
+        }
+      }
+
+      const totalCount = buildPlan.length;
+      const configs = [];
+      let index = 1;
+
+      for (const item of buildPlan) {
+        const cfg = buildConfig(TEMPLATE, item.linkInfo, item.ep, item.port, socksPort, adv, index, totalCount);
+        if (cfg) {
+          configs.push(cfg);
+          index++;
+        }
+      }
+
+      outputCount = configs.length;
+      outputJson = JSON.stringify(configs, null, 2);
+
+      const hasSubUrl = rawInput.includes('http://') || rawInput.includes('https://');
+      const fetchBtn = document.getElementById('fetchBtn');
+      if (fetchBtn) {
+        fetchBtn.style.display = hasSubUrl ? 'inline-block' : 'none';
+      }
+
+      const statusInfo = document.getElementById('statusInfo');
+      if (outputCount > 0) {
+        statusInfo.textContent = `${outputCount} configuration${outputCount !== 1 ? 's' : ''} ready`;
+      } else if (hasSubUrl) {
+        statusInfo.textContent = "Subscription URL detected. Click 'Fetch URL' to load";
+      } else {
+        statusInfo.textContent = "Paste VLESS or Trojan links to generate";
+      }
+    }
+
+    function copyOutput() {
+      if (!outputJson || outputCount === 0) {
+        toast("No valid links entered");
+        return;
+      }
+
+      navigator.clipboard.writeText(outputJson).then(() => {
+        toast(`Copied ${outputCount} config${outputCount !== 1 ? 's' : ''}`);
+      }).catch(() => {
+        toast("Clipboard access failed");
+      });
+    }
+
+    function downloadOutput() {
+      if (!outputJson || outputCount === 0) {
+        toast("No valid links entered");
+        return;
+      }
+
+      const blob = new Blob([outputJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'configs.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast("Downloaded configs.json");
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2000);
+    }
+  </script>
+</body>
+</html>
